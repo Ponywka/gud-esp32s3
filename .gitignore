@@ -1,0 +1,28 @@
+# ESP-IDF build output and generated config (regenerated from sdkconfig.defaults)
+build/
+sdkconfig
+sdkconfig.old
+dependencies.lock
+managed_components/
+
+# Out-of-tree kernel module build artifacts
+host/gud-module/*.o
+host/gud-module/*.ko
+host/gud-module/*.mod
+host/gud-module/*.mod.c
+host/gud-module/.*.cmd
+host/gud-module/Module.symvers
+host/gud-module/modules.order
+
+# Python
+__pycache__/
+
+# IDE
+.idea/
+
+# Prebuilt images (build them instead)
+*.bin
+
+# Waveshare board documentation: not ours to redistribute, see the link in README.md
+ESP32-S3-Touch-LCD-4.3-Sch-*.pdf
+ESP32-S3-Touch-LCD-4in3_3D_Drawing.zip

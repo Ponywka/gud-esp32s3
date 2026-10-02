@@ -1,0 +1,21 @@
+#pragma once
+/* TinyUSB configuration: ESP32-S3 native USB (DWC2, Full-Speed, slave/IRQ mode),
+ * one HID instance (multitouch) + app-defined vendor class driver (GUD). */
+
+#define CFG_TUSB_OS                 OPT_OS_FREERTOS
+#define CFG_TUSB_DEBUG              0
+#define CFG_TUSB_MEM_SECTION
+#define CFG_TUSB_MEM_ALIGN          __attribute__((aligned(4)))
+
+#define CFG_TUD_ENABLED             1
+#define CFG_TUD_MAX_SPEED           OPT_MODE_FULL_SPEED
+#define CFG_TUD_DWC2_SLAVE_ENABLE   1
+#define CFG_TUD_DWC2_DMA_ENABLE     0
+#define CFG_TUD_ENDPOINT0_SIZE      64
+
+#define CFG_TUD_CDC                 0
+#define CFG_TUD_MSC                 0
+#define CFG_TUD_MIDI                0
+#define CFG_TUD_VENDOR              0
+#define CFG_TUD_HID                 1
+#define CFG_TUD_HID_EP_BUFSIZE      64
