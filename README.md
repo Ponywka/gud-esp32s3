@@ -2,6 +2,8 @@
 
 **English** | [Русский](README.ru.md)
 
+![Preview](docs/images/preview.jpg)
+
 Firmware for the **Waveshare ESP32-S3-Touch-LCD-4.3** (not the B version, SKU 25948) that turns the board into a USB display for Linux.
 On the Type-C1 port (native USB) the host sees it as:
 

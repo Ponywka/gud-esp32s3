@@ -2,6 +2,8 @@
 
 [English](README.md) | **Русский**
 
+![Превью](docs/images/preview.jpg)
+
 Прошивка для **Waveshare ESP32-S3-Touch-LCD-4.3** (не B, SKU 25948), превращающая плату в USB-дисплей для Linux.
 Через порт Type-C1 (native USB) плата определяется хостом как:
 
