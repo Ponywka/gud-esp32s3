@@ -33,7 +33,9 @@
 #define BOARD_UI_ROTATE_CCW   1
 #define BOARD_UI_ROTATE_CW    2
 #define BOARD_UI_ROTATE_UD    3
+#ifndef BOARD_UI_ROTATION                     /* tools/release.sh builds every variant */
 #define BOARD_UI_ROTATION     BOARD_UI_ROTATE_CCW
+#endif
 
 /* CH422G output bits: EXIOn is wired to CH422G IOn (schematic), IO0 is not connected */
 #define EXIO_CTP_RST       (1u << 1)

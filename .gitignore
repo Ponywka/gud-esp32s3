@@ -1,5 +1,6 @@
 # ESP-IDF build output and generated config (regenerated from sdkconfig.defaults)
 build/
+build-release/
 sdkconfig
 sdkconfig.old
 dependencies.lock
@@ -20,8 +21,9 @@ __pycache__/
 # IDE
 .idea/
 
-# Prebuilt images (build them instead)
+# Prebuilt images (build them instead) and release output
 *.bin
+dist/
 
 # Waveshare board documentation: not ours to redistribute, see the link in README.md
 ESP32-S3-Touch-LCD-4.3-Sch-*.pdf

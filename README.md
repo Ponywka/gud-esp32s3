@@ -49,6 +49,47 @@ straight into the framebuffer, those repeats were random PSRAM reads that took b
 Now the repeats are read from the window in internal memory, and finished pixels are only written to the framebuffer,
 sequentially.
 
+## Installation from a release
+
+Download the image for your mounting from [Releases](https://github.com/Ponywka/gud-esp32s3/releases): one file
+(bootloader + partition table + firmware) written at address `0x0`. `SHA256SUMS` lists checksums
+(`sha256sum -c SHA256SUMS --ignore-missing`).
+
+The variants differ only in the orientation of the firmware's own `<NO SIGNAL>` screen; pick the one that matches
+the rotation set on the host (Xorg `Rotate`, see "Host"):
+
+| File | `<NO SIGNAL>` orientation | Xorg `Rotate` |
+|---|---|---|
+| `gud-esp32s3-vX.Y.Z-ccw.bin` | portrait, picture turned 90 degrees counterclockwise | `CCW` |
+| `gud-esp32s3-vX.Y.Z-cw.bin` | portrait, picture turned 90 degrees clockwise | `CW` |
+| `gud-esp32s3-vX.Y.Z-ud.bin` | landscape, upside down | `UD` |
+| `gud-esp32s3-vX.Y.Z-landscape.bin` | landscape, as the panel is | none |
+
+### First flashing (from the stock Waveshare firmware)
+
+Needed once, with the buttons. Either port works: **Type-C1** (USB) or **Type-C2** (UART).
+
+1. Connect the board to the computer.
+2. Put it into download mode: **hold BOOT, press and release RESET, release BOOT.**
+3. Flash it in one of these ways:
+   - **From the browser**, nothing to install (Chrome/Edge): open https://espressif.github.io/esptool-js/, press
+     *Connect* and pick the board's port, leave the address at `0x0`, choose your `gud-esp32s3-vX.Y.Z-<variant>.bin`, press *Program*.
+   - **esptool:**
+     ```sh
+     pip install esptool
+     esptool.py --chip esp32s3 write_flash 0x0 gud-esp32s3-vX.Y.Z-ccw.bin
+     ```
+4. Press **RESET**: the screen shows `<NO SIGNAL>`.
+5. Connect the board to the Linux host via **Type-C1** and set up the host (see "Host").
+
+### Updating
+
+- **Without buttons**, if this firmware is already installed: `tools/flash.sh gud-esp32s3-vX.Y.Z-ccw.bin` from this
+  repository (needs Docker). The script reboots the display into download mode over the Type-C1 cable by itself.
+- **Or the same way as the first flashing**: BOOT + RESET, then the browser or esptool.
+
+A merged image also overwrites the settings area (NVS), so the saved brightness returns to the default.
+
 ## Building
 
 ESP-IDF v5.3.x. Without installing IDF - in the official container:
@@ -66,7 +107,8 @@ The board's module has 8 MB flash and 8 MB octal PSRAM (settings in `sdkconfig.d
 **The usual way - over the display's cable (Type-C1), no buttons:**
 
 ```sh
-tools/flash.sh
+tools/flash.sh                             # build/ after idf.py build
+tools/flash.sh gud-esp32s3-vX.Y.Z-ccw.bin  # or a merged image, at 0x0
 ```
 
 The script sends the display vendor request `0xB0` (reboot); for ~1.5 s the bootloader hands the port to the
@@ -85,6 +127,24 @@ docker run --rm --device /dev/ttyACM0 -v $PWD:/project -w /project/build espress
 Auto-reset through the CH343's DTR/RTS is unreliable on this board, hence the buttons.
 Don't connect Type-C1 and Type-C2 to different power sources at the same time: Type-C1 VBUS is wired straight to the
 board's 5V rail.
+
+### Preparing a release
+
+Publishing a release on GitHub (with a new `vX.Y.Z` tag) is enough: the `Release images` workflow
+(`.github/workflows/release.yml`) builds the images and attaches them to the release within a few minutes. A manual
+run of the workflow (Actions -> Release images -> Run workflow) makes a test build and keeps it as an artifact.
+
+Locally the same is done by:
+
+```sh
+tools/release.sh vX.Y.Z
+```
+
+Builds all four `<NO SIGNAL>` orientations (each in its own `build-release/<variant>/`, `build/` is left alone),
+merges every one into `dist/gud-esp32s3-vX.Y.Z-<variant>.bin` and writes `dist/SHA256SUMS`. Without an argument the
+version comes from `git describe`. Attach everything in `dist/` to the release. Separate images for those who flash by
+hand are in `build-release/<variant>/` (`bootloader/bootloader.bin`, `partition_table/partition-table.bin`, `gud-esp32s3.bin`, addresses
+in `flash_args`); flashing them separately keeps NVS, i.e. the saved brightness.
 
 ## Host
 

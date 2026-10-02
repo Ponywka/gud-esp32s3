@@ -5,7 +5,7 @@ Flash the display over its native USB port (Type-C1), no BOOT button or cable sw
 1. If the GUD firmware is running, ask it to reboot (vendor request USB_REQ_VENDOR_REBOOT).
 2. On every boot the bootloader gives the port to USB-Serial-JTAG for ~1 s (bootloader_components/usb_dl_window).
    Catch that window and let esptool reset the chip into ROM download mode through it.
-3. Flash build/flash_args and hard-reset into the new firmware.
+3. Flash build/flash_args (or a merged image given as the argument, at 0x0) and hard-reset into the new firmware.
 
 If the firmware is broken and doesn't answer, just replug the cable: the window opens on every boot.
 Runs inside the espressif/idf container (see tools/flash.sh); needs /dev and /sys of the host.
@@ -99,9 +99,10 @@ def main():
         sys.exit("USB-Serial-JTAG port didn't show up")
 
     print("USB-Serial-JTAG at %s, flashing" % port)
+    image = ["0x0", sys.argv[1]] if len(sys.argv) > 1 else ["@flash_args"]
     try:
         esptool.main(["--chip", "esp32s3", "-p", port, "--before", "default_reset", "--after", "hard_reset",
-                      "write_flash", "@flash_args"] + sys.argv[1:])
+                      "write_flash"] + image)
     except (serial.SerialException, OSError) as e:
         # After the reset the port disappears (the app takes the PHY over), esptool may trip on reopening it
         print("esptool: %s (expected: the port went away when the board rebooted)" % e)

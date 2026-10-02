@@ -1,0 +1,39 @@
+# Builds the release images (all "<NO SIGNAL>" orientations, see tools/release.sh).
+#  - release published: attaches dist/* (images + SHA256SUMS) to that release
+#  - manual run: keeps dist/* as a workflow artifact, for a test build
+name: Release images
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # git describe for manual runs
+
+      - name: Pull ESP-IDF image
+        run: docker pull -q espressif/idf:v5.3.4
+
+      - name: Build all variants
+        run: tools/release.sh "${{ github.event.release.tag_name || '' }}"
+
+      - name: Attach to the release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" dist/* --clobber
+
+      - name: Keep as artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: gud-esp32s3-images
+          path: dist/
