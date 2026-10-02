@@ -150,6 +150,12 @@ in `flash_args`); flashing them separately keeps NVS, i.e. the saved brightness.
 
 ### The `gud` driver
 
+> [!NOTE]
+> **No picture after connecting the display, but touch works?** The display is most likely fine: the host kernel just
+> has no `gud` module. The screen keeps showing `<NO SIGNAL>` (and goes dark after 60 s), `lsusb` lists `1d50:614d`,
+> but `modinfo gud` finds nothing and `ls /sys/class/drm | grep USB` is empty. Any Linux printer host or computer can
+> drive the display - build the `gud` module for its kernel (below) and the picture appears.
+
 ```sh
 modinfo gud                  # usually present in Armbian (CONFIG_DRM_GUD=m)
 sudo modprobe gud
